@@ -15,7 +15,7 @@ DEFAULT_LOG_LEVEL = logging.WARNING
 DEFAULT_RECEIVE_BUFSIZE = 1024
 PROTOCOL_IDENTIFIER_REQUEST = 0x00
 PROTOCOL_IDENTIFIER_RESPONSE = 0x7F
-
+RESPONSE_CODE_OK = 0x00
 
 def parse_args():
     """
@@ -106,9 +106,11 @@ def parse_response(response):
     logging.debug("parsed response %s", parsed_response)
     if parsed_response[0] != PROTOCOL_IDENTIFIER_RESPONSE:
         raise ValueError(
-            f"invalid protocol identifier (got {response[0]}, "
+            f"invalid protocol identifier (got {parsed_response[0]}, "
             f"expected {PROTOCOL_IDENTIFIER_RESPONSE})"
         )
+    if parsed_response[1] != RESPONSE_CODE_OK:
+        raise ValueError(f"response not ok (got code {parsed_response[1]}")
     return parsed_response
 
 def nth_bit(n, is_set):
@@ -144,7 +146,7 @@ def main(args):
     logging.debug("args: %s", args)
     results = process(args)
     if results:
-        logging.warning("Relays switched. Current temperature %f", results[-1])
+        logging.warning("Relays switched %s. Current temperature %f", hex(results[-2]), results[-1])
 
     return 0 if results else 1
 

@@ -1,0 +1,5 @@
+version: "3.7"
+
+services: 
+  kepu:
+    image: markotuononen/kepu-cron:latest
