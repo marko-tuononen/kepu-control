@@ -1,5 +1,13 @@
 # kepu-control
-Control lights and water for a kitchen garden (keittiöpuutarha, kepu) 
+Control lights and water for a kitchen garden (keittiöpuutarha, kepu)
+
+Hardware used to build a prototype
+
+* WeMos D1 Mini v2 NodeMCU ESP8266
+* Two channel relay module
+* DS18B20 1-Wire Temperature Sensor
+
+![Prototype image](docs/images/prototype.jpg)
 
 ## Firmware project
 Create WiFiConfig.h with your wifi configuration
