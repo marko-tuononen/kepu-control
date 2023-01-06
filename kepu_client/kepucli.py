@@ -11,7 +11,8 @@ import sys
 
 DEFAULT_HOST = "192.168.101.102"
 DEFAULT_PORT = 29500
-DEFAULT_LOG_LEVEL = logging.WARNING
+DEFAULT_LOG_LEVEL = logging.INFO
+DEFAULT_LOG_DATEFMT = "%Y-%m-%dT%H:%M:%S%z"
 DEFAULT_RECEIVE_BUFSIZE = 1024
 PROTOCOL_IDENTIFIER_REQUEST = 0x00
 PROTOCOL_IDENTIFIER_RESPONSE = 0x7F
@@ -43,6 +44,12 @@ def parse_args():
         type=int,
         default=DEFAULT_LOG_LEVEL,
         help="log level"
+    )
+    parser.add_argument(
+        "--log-datefmt",
+        type=str,
+        default=DEFAULT_LOG_DATEFMT,
+        help="log date and time format"
     )
     parser.add_argument(
         "--receive-bufsize",
@@ -88,13 +95,13 @@ def send_and_recv(host, port, bufsize, request):
     """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((host, port))
-        logging.info("Connected to %s:%s", host, port)
+        logging.debug("Connected to %s:%s", host, port)
         logging.debug("socket: %s", sock)
         logging.debug("request: %s", bytes_to_hex(request))
         sock.sendall(request)
-        logging.info("Sent request: %d bytes", len(request))
+        logging.debug("Sent request: %d bytes", len(request))
         response = sock.recv(bufsize)
-        logging.info("Received response: %d bytes", len(response))
+        logging.debug("Received response: %d bytes", len(response))
         logging.debug("response: %s", bytes_to_hex(response))
         return response
 
@@ -142,11 +149,15 @@ def main(args):
     """
     Main function, takes command-line arguments as a parameter
     """
-    logging.getLogger().setLevel(args.log_level)
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=args.log_level,
+        datefmt=args.log_datefmt
+    )
     logging.debug("args: %s", args)
     results = process(args)
     if results:
-        logging.warning("Relays switched %s. Current temperature %f", hex(results[-2]), results[-1])
+        logging.info("Relays switched and their current state is %s. Current temperature is %f.", hex(results[-2]), results[-1])
 
     return 0 if results else 1
 
